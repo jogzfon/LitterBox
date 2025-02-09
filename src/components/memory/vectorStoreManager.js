@@ -33,7 +33,7 @@ class VectorStoreManager {
         fs.mkdirSync(embeddingsDir, { recursive: true });
 
         // Initialize cache store with specific namespace
-        const cacheDir = path.join(embeddingsDir, 'cache');
+        const cacheDir = './src/cache';
         fs.mkdirSync(cacheDir, { recursive: true });
         
         this.store = new LocalFileStore({
@@ -65,7 +65,7 @@ class VectorStoreManager {
             }
             this.vectorStore = await FaissStore.fromDocuments(
                 chunks,
-                this.embeddings
+                this.cachedEmbedder
             );
             // Save the vector store to disk
             await this.saveVectorStore();
@@ -92,7 +92,7 @@ class VectorStoreManager {
         try {
             const results = await this.multiQueryHandler.search(query);
             // return results.slice(0, k); // Limit results to k documents
-            return results.slice;
+            return results;
         } catch (error) {
             console.error("Error during multiquery search:", error);
             throw error;
@@ -125,7 +125,7 @@ class VectorStoreManager {
             try {
                 this.vectorStore = await FaissStore.load(
                     this.vectorStorePath,
-                    this.embeddings
+                    this.cachedEmbedder
                 );
             } catch (error) {
                 console.error("Failed to load vector store:", error);
